@@ -1,0 +1,123 @@
+#
+# A couple of useful guides & docs:
+#
+# - Main Bitrise CLI docs: https://github.com/bitrise-io/bitrise/tree/master/_docs
+# - Step Development Guideline: https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+# - Bitrise.yml format spec: https://github.com/bitrise-io/bitrise/blob/master/_docs/bitrise-yml-format-spec.md
+# - Bitrise docs: http://devcenter.bitrise.io/
+# - Bitrise CLI guides: http://devcenter.bitrise.io/bitrise-cli/
+
+title: |-
+  Amazon S3 Bucket Sync Incremental
+summary: |
+  Amazon S3 Bucket Sync step syncs the given local folder with an S3 bucket *without* deleting existing files.
+description: |
+  This step requires an Amazon S3 registration. Forked from [Amazon S3 Bucket Sync](https://github.com/bitrise-steplib/steps-amazon-s3-upload)
+website: https://github.com/digioak/bitrise-step-amazon-s3-bucket-sync-incremental
+source_code_url: https://github.com/digioak/bitrise-step-amazon-s3-bucket-sync-incremental
+support_url: https://github.com/digioak/bitrise-step-amazon-s3-bucket-sync-incremental/issues
+
+# If this step should be available only for certain project types
+# just uncomment this `project_type_tags` section and include all the
+# project types supported by the step. If the step can be used for all
+# project types then you can just remove this section.
+# If no `project_type_tags` specified (or specified as an empty array)
+# that means the step can be used for any project type.
+# You can find more information about project type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+#
+# project_type_tags:
+#   - ios
+#   - macos
+#   - android
+#   - xamarin
+#   - react-native
+#   - cordova
+#   - ionic
+#   - flutter
+
+# Type tags are used for categorizing steps, for easier step discovery in Step Libraries.
+# You can find more information about type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+type_tags:
+  - deploy
+
+is_requires_admin_user: false
+is_always_run: false
+is_skippable: false
+deps:
+  brew:
+  - name: awscli
+  apt_get:
+  - name: awscli
+run_if: ""
+
+toolkit:
+  bash:
+    entry_file: step.sh
+
+inputs:
+  - access_key_id: ""
+    opts:
+      title: "AWS Access Key"
+      summary: ""
+      description: ""
+      is_required: true
+      is_expand: true
+      is_sensitive: true
+  - secret_access_key: ""
+    opts:
+      title: "AWS Secret Key"
+      summary: ""
+      description: ""
+      is_required: true
+      is_expand: true
+      is_sensitive: true
+  - upload_bucket: ""
+    opts:
+      title: "S3 Bucket Name"
+      summary: ""
+      description: ""
+      is_required: true
+  - upload_local_path: ""
+    opts:
+      title: "Local path to upload"
+      summary: ""
+      description: |
+        If you want to sync only the content of
+        the folder but don't want to create the folder, then you
+        should append a slash at the end of the path. For example: ./folder/
+      is_required: true
+  - acl_control: "private"
+    opts:
+      title: "Access Control"
+      summary: ""
+      description: ""
+      value_options:
+      - "public-read"
+      - "private"
+      is_required: true
+  - set_acl_only_on_changed_objets: "true"
+    opts:
+      title: "Set ACL only on changed objects?"
+      summary: |-
+        If it is set to "true", it'll only set ACL for changed objects, which is
+        way faster to do than to check and set every objects' ACL.
+
+        Generally, you can keep this option on "yes" to get a speed boost,
+        and you should only change it to "false" if you changed the
+        ACL option (to set every object's ACL to the specified one).
+      description: ""
+      value_options:
+        - "true"
+        - "false"
+      is_required: true
+  - aws_region: ""
+    opts:
+      title: "AWS Region"
+      summary: ""
+      description: |
+        Here you can specify a different AWS region of the bucket. You can leave
+        it empty to use the default config/env setting.
+
+outputs: []
